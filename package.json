@@ -1,0 +1,33 @@
+{
+  "name": "collector",
+  "version": "1.0.1",
+  "description": "Data collector server app",
+  "main": "index.js",
+  "scripts": {
+    "server": "nodemon --watch  -- index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yasyash/collectorS.git"
+  },
+  "author": "Yaroslav Shkliar & ILIT.RU",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/yasyash/collectorS/issues"
+  },
+  "homepage": "https://github.com/yasyash/collectorS#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "bookshelf": "^1.2.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "https": "^1.0.0",
+    "knex": "^0.21.4",
+    "lodash.isempty": "^4.4.0",
+    "pg": "^8.3.0"
+  }
+}
