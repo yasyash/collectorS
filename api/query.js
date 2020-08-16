@@ -67,13 +67,15 @@ router.post('/inject', (req, resp) => {
         "хлорбензол": "P077",
         "этилбензол": "P083"
     };
+    console.log('begin');
+    console.log('token = ', token);
 
     Stations.query('where', 'code', token)
         .fetchAll()
         .then(results => {
 
             result = results.toJSON();
-            
+
             if (result.length > 0) {
 
                 var idd = result[0].idd;
@@ -87,14 +89,10 @@ router.post('/inject', (req, resp) => {
                 };
 
                 for (key in params) {
-                    console.log('keys ', idd, params[key].serialnum, date_time, key, params[key].measure);
 
-                    Sensors_data.forge({ "idd": idd, "serialnum": params[key].serialnum, "date_time": params[key].date_time, "typemeasure": key, "measure": params[key].measure, "is_alert": false }).save()
-                        .catch(err => resp.status(404).json({ "success": false, "error": err }));
+                    finder(idd, params[key].serialnum, params[key].date_time, key, params[key].measure);
 
                 }
-                console.log('the message is successfully processed... ');
-
                 resp.json({ success: true, message: message });
             }
             else {
@@ -104,13 +102,37 @@ router.post('/inject', (req, resp) => {
 
             }
         })
-        .catch(err => resp.status(404).json({ "success": false, "error": err }));
+        .catch(err => {
+            console.log('the message id = ', message, "is processed with DB fail...");
+
+            resp.status(404).json({ "success": false, "error": err })
+        });
 
 
 });
 
 router.get('/inject', (req, resp) => {
-    resp.send({ "error" : "Method GET in not support." });
+    resp.send({ "error": "Method GET in not support." });
 });
+
+async function finder(idd, serialnum, date_time, key, measure) {
+    await Sensors_data.where('serialnum', serialnum)
+        .where('date_time', date_time)
+        .where('typemeasure', key)
+        .fetchAll()
+        .then(recordset => {
+            record = recordset.toJSON();
+            //console.log('recordset lenght= ', record);
+
+            if (record.length == 0) {
+                console.log('keys ', idd, serialnum, date_time, key, measure);
+
+                Sensors_data.forge({ "idd": idd, "serialnum": serialnum, "date_time": date_time, "typemeasure": key, "measure": measure, "is_alert": false }).save()
+                    .catch(err => resp.status(404).json({ "success": false, "error": err }));
+                console.log('the message is successfully processed... ');
+            }
+            delete (record);
+        }).catch(err => resp.status(404).json({ "success": false, "recordset": err }));
+}
 
 module.exports = router;
