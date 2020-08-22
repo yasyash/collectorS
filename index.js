@@ -1,10 +1,11 @@
 
 
-var express = require ('express');
-var  bodyParser = require ('body-parser');
-var query = require ('./api/query');
+const express = require ('express');
+const  bodyParser = require ('body-parser');
+const query = require ('./api/query');
 const https = require('https');
 const fs = require('fs');
+
 
 const app = express();
 
@@ -19,6 +20,7 @@ const options = {
 
 
 https.createServer(options, app).listen(8484, () => {
+
     console.log('Server SSL is started on 8484 port...');
 });
 

@@ -67,8 +67,8 @@ router.post('/inject', (req, resp) => {
         "хлорбензол": "P077",
         "этилбензол": "P083"
     };
-    console.log('begin');
-    console.log('token = ', token);
+    //console.log('params = ', params);
+   // console.log('token = ', token);
 
     Stations.query('where', 'code', token)
         .fetchAll()
@@ -79,7 +79,7 @@ router.post('/inject', (req, resp) => {
             if (result.length > 0) {
 
                 var idd = result[0].idd;
-                console.log('message id = ', message);
+               // console.log('message id = ', message);
                 for (key in params) {
                     if (aspapi_codes[key]) {
                         var val = aspapi_codes[key];
@@ -90,7 +90,9 @@ router.post('/inject', (req, resp) => {
 
                 for (key in params) {
 
-                    finder(idd, params[key].serialnum, params[key].date_time, key, params[key].measure);
+                    finder(idd, params[key].serialnum, params[key].date_time, key, params[key].measure).then (_err => {
+                    if (!isEmpty(_err))
+                resp.status(404).json({ "success": false });    });
 
                 }
                 resp.json({ success: true, message: message });
@@ -122,17 +124,17 @@ async function finder(idd, serialnum, date_time, key, measure) {
         .fetchAll()
         .then(recordset => {
             record = recordset.toJSON();
-            //console.log('recordset lenght= ', record);
+//            console.log('recordset lenght = ', record);
 
             if (record.length == 0) {
-                console.log('keys ', idd, serialnum, date_time, key, measure);
+    //            console.log('keys ', idd, serialnum, date_time, key, measure);
 
                 Sensors_data.forge({ "idd": idd, "serialnum": serialnum, "date_time": date_time, "typemeasure": key, "measure": measure, "is_alert": false }).save()
-                    .catch(err => resp.status(404).json({ "success": false, "error": err }));
-                console.log('the message is successfully processed... ');
+                    .catch(err => err);
+  //              console.log('the message is successfully processed... ');
             }
             delete (record);
-        }).catch(err => resp.status(404).json({ "success": false, "recordset": err }));
+        }).catch(err =>  err);
 }
 
 module.exports = router;
